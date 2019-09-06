@@ -6,6 +6,7 @@ type Provider interface {
 	Get(k string) ([]string, bool)
 	Set(k string, v []string)
 	Add(k string, v string)
+	List() map[string][]string
 }
 
 type Storage struct {
@@ -48,5 +49,19 @@ func (s *Storage) set(k string, v []string) {
 }
 
 func (s *Storage) add(k string, v string) {
+	if _, ok := s.data[k]; !ok {
+		s.data[k] = make([]string, 0)
+	}
 	s.data[k] = append(s.data[k], v)
+}
+
+func (s *Storage) List() map[string][]string {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+	return s.list()
+}
+
+func (s *Storage) list() map[string][]string {
+	res := s.data
+	return res
 }

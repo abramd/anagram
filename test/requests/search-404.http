@@ -1,0 +1,5 @@
+GET http://localhost:80/search?word=qwerty
+Accept: */*
+Cache-Control: no-cache
+
+###

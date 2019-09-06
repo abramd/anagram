@@ -35,8 +35,15 @@ func NewServer(searcher *search.Searcher, data data.Provider, sorter sort.Sorter
 }
 
 func (s *Server) Search(w http.ResponseWriter, r *http.Request) {
+	err := r.ParseForm()
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
 	word := r.Form.Get(wordParam)
 	res := s.searcher.Search(word)
+
 	b, err := json.Marshal(&SearchResponse{Data: res})
 	if err != nil {
 		http.Error(w, "internal server error", http.StatusInternalServerError)
@@ -57,6 +64,16 @@ func (s *Server) Add(w http.ResponseWriter, r *http.Request) {
 		k := s.sorter.Sort(v)
 		s.data.Add(k, v)
 	}
+}
+
+func (s *Server) List(w http.ResponseWriter, r *http.Request) {
+	res := s.data.List()
+	b, err := json.Marshal(&res)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	_, _ = w.Write(b)
 }
 
 func Method(mthd string, next http.HandlerFunc) http.HandlerFunc {
