@@ -6,6 +6,7 @@ import (
 	"github.com/abramd/anagram/internal/search"
 	"github.com/abramd/anagram/pkg/sort"
 	"net/http"
+	"strings"
 )
 
 const (
@@ -42,7 +43,7 @@ func (s *Server) Search(w http.ResponseWriter, r *http.Request) {
 	}
 
 	word := r.Form.Get(wordParam)
-	res := s.searcher.Search(word)
+	res := s.searcher.Search(strings.ToLower(word))
 
 	b, err := json.Marshal(&SearchResponse{Data: res})
 	if err != nil {
@@ -61,7 +62,7 @@ func (s *Server) Add(w http.ResponseWriter, r *http.Request) {
 	}
 
 	for _, v := range req.Data {
-		k := s.sorter.Sort(v)
+		k := s.sorter.Sort(strings.ToLower(v))
 		s.data.Add(k, v)
 	}
 }
